@@ -1,21 +1,45 @@
-//
-//  ContentView.swift
-//  chronos
-//
-//  Created by Prasanth Dendukuri on 2/12/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @State private var tasks: [Task] = []
+    @State private var fillerText: String = ""
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationView {
+            VStack {
+                TextField(
+                    "meeting @ 2 pm",
+                    text: $fillerText
+                    
+                )
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .onSubmit{
+                    addTask(text: fillerText)
+                }
+                List {
+                    ForEach($tasks) { task in
+                        TaskView(text: fillerText)
+                    }
+                    .onDelete(perform: deleteTasks)
+                }
+            }
+            .navigationTitle("Tasks")
+            .background(Color.white)
         }
-        .padding()
+        .background(Color.white)
+
+    }
+    
+    private func addTask(text: String) {
+        
+        guard !fillerText.isEmpty else { return }
+        let newTask = Task(name: text)
+                tasks.append(newTask)
+//                fillerText = ""
+
+    }
+
+    private func deleteTasks(at offsets: IndexSet) {
+        tasks.remove(atOffsets: offsets)
     }
 }
 
