@@ -15,8 +15,8 @@ struct TaskListView: View {
     @Query private var tasks: [Task]
     @State private var fillerText: String = ""
     @Environment(\.modelContext) var modelContext
-    @ObserveInjection var inject
-    @ObserveInjection var forceRedraw
+//    @ObserveInjection var inject
+//    @ObserveInjection var forceRedraw
 
     var body: some View {
         VStack {
@@ -53,15 +53,21 @@ struct TaskListView: View {
 
                 }
 
-
             }
             .padding(.horizontal) // Adds some spacing from screen edge
             
             List {
                 ForEach(tasks) { task in
-                    TaskView(text: task.name)
+                    TaskView(
+                            text: task.name,
+                            onDelete: {
+                                modelContext.delete(task)
+                            }
+                        )
+
+
                 }
-//                .onDelete(perform: deleteTasks)
+                .onDelete(perform: deleteTask)
             }
         }
         .navigationTitle("Tasks")
@@ -69,7 +75,6 @@ struct TaskListView: View {
         .enableInjection()
        
     }
-    @ObserveInjection var redraw
 
 
     
@@ -80,6 +85,15 @@ struct TaskListView: View {
         modelContext.insert(newTask)
         fillerText = ""
     }
+    
+    private func deleteTask(at offsets: IndexSet) {
+            for index in offsets {
+                let task = tasks[index]
+                modelContext.delete(task) // Delete the task from the model context
+            }
+        }
+
+
     
     
 }

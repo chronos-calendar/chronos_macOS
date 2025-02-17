@@ -17,7 +17,7 @@ struct RoundedRectangleCheckboxStyle: ToggleStyle {
             ZStack {
                 RoundedRectangle(cornerRadius: 6)
                     .stroke(Color.black, lineWidth: 1)
-                    .frame(width: 16, height: 16)
+                    .frame(width: 16, height:15 )
                 
                 if configuration.isOn {
                     RoundedRectangle(cornerRadius: 4)
@@ -44,23 +44,27 @@ struct RoundedRectangleCheckboxStyle: ToggleStyle {
 
 struct TaskView: View {
     @State private var isChecked: Bool = false
-    @State var text: String;
-    
-    var body: some View{
-        VStack{
-            Toggle(isOn: $isChecked){
+    var text: String // Keep task text
+    var onDelete: () -> Void // Closure to handle deletion
+
+    var body: some View {
+        VStack {
+            Toggle(isOn: $isChecked) {
                 Text(text)
                     .font(.body)
-                    .foregroundColor(Color.black)
-                
+                    .foregroundColor(.black)
             }
             .toggleStyle(RoundedRectangleCheckboxStyle())
+            .onChange(of: isChecked) { value in
+                if value {
+                    onDelete() // Call the passed closure when checkbox is checked
+                }
+            }
         }
         .padding(.vertical, 4)
     }
- 
 }
 
-#Preview {
-    TaskView(text: "babe")
-}
+//#Preview {
+//    TaskView(text: "babe")
+//}
