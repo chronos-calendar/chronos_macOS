@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import CoreData
 
 struct RoundedRectangleCheckboxStyle: ToggleStyle {
     @State private var isHovering = false
@@ -50,6 +51,7 @@ struct TaskView: View {
             Toggle(isOn: $isChecked){
                 Text(text)
                     .font(.body)
+                    .foregroundColor(Color.black)
                 
             }
             .toggleStyle(RoundedRectangleCheckboxStyle())

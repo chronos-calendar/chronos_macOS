@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		244B8C6E2D62C3E600364D21 /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 244B8C6D2D62C3E600364D21 /* Inject */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		248F75452D5D642500073946 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				244B8C6E2D62C3E600364D21 /* Inject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,12 +77,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		244B8C6C2D62C3E600364D21 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		248F752A2D5D642300073946 = {
 			isa = PBXGroup;
 			children = (
 				248F75352D5D642300073946 /* chronos */,
 				248F75472D5D642500073946 /* chronosTests */,
 				248F75512D5D642500073946 /* chronosUITests */,
+				244B8C6C2D62C3E600364D21 /* Frameworks */,
 				248F75342D5D642300073946 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -112,6 +125,7 @@
 			);
 			name = chronos;
 			packageProductDependencies = (
+				244B8C6D2D62C3E600364D21 /* Inject */,
 			);
 			productName = chronos;
 			productReference = 248F75332D5D642300073946 /* chronos.app */;
@@ -195,6 +209,9 @@
 			);
 			mainGroup = 248F752A2D5D642300073946;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				244B8C6B2D62BC3400364D21 /* XCRemoteSwiftPackageReference "Inject" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 248F75342D5D642300073946 /* Products */;
 			projectDirPath = "";
@@ -306,7 +323,6 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -369,7 +385,6 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -403,8 +418,15 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+					"-Xlinker",
+					"-interposable",
 				);
 				MARKETING_VERSION = 1.0;
+                OTHER_LDFLAGS = (
+                    "-Xlinker",
+                    "-interposable",
+                );
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				PRODUCT_BUNDLE_IDENTIFIER = pro.chronos;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -541,6 +563,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		244B8C6B2D62BC3400364D21 /* XCRemoteSwiftPackageReference "Inject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzysztofzablocki/Inject.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		244B8C6D2D62C3E600364D21 /* Inject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 244B8C6B2D62BC3400364D21 /* XCRemoteSwiftPackageReference "Inject" */;
+			productName = Inject;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 248F752B2D5D642300073946 /* Project object */;
 }
