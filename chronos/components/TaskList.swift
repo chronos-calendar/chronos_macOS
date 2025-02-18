@@ -15,11 +15,10 @@ struct TaskListView: View {
     @Query private var tasks: [Task]
     @State private var fillerText: String = ""
     @Environment(\.modelContext) var modelContext
-//    @ObserveInjection var inject
-//    @ObserveInjection var forceRedraw
-
     var body: some View {
+
         VStack {
+
             ZStack {
                 // Gray background
                 RoundedRectangle(cornerRadius: 10)
@@ -35,7 +34,7 @@ struct TaskListView: View {
                             .padding(.horizontal, 25) // Align with input text
                     }
                     
-                    // Actual TextField
+                    // task name text field
                     TextField("", text: $fillerText)
                         .textFieldStyle(PlainTextFieldStyle())
                         .padding(.horizontal, 16)
@@ -54,7 +53,7 @@ struct TaskListView: View {
                 }
 
             }
-            .padding(.horizontal) // Adds some spacing from screen edge
+            .padding(.horizontal)
             
             List {
                 ForEach(tasks) { task in
@@ -69,9 +68,12 @@ struct TaskListView: View {
                 }
                 .onDelete(perform: deleteTask)
             }
+            .background(Color.white) // Set List background to white
+            .scrollContentBackground(.hidden)
+
+
         }
-        .navigationTitle("Tasks")
-        .background(Color.white)
+
         .enableInjection()
        
     }

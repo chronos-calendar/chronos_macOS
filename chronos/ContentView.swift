@@ -3,18 +3,26 @@ import SwiftData
 import Inject
 
 struct ContentView: View {
-//    @ObserveInjection var inject
+    @ObserveInjection var inject
 
     var body: some View {
-        NavigationView {
-            TaskListView()
+        HSplitView {
             
-            Text("daddy chill")
+            VStack{
+                TabsView()
+                TaskListView()
+                    .background(Color.white)
+                
+
+            }
+                        Text("wait it works now")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-//        .enableInjection()
+        .enableInjection()
+        .background(Color.white)
 
     }
+
 
 }
 

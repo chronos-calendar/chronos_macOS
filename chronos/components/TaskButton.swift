@@ -22,7 +22,7 @@ struct RoundedRectangleCheckboxStyle: ToggleStyle {
                 if configuration.isOn {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color.gray)
-                        .frame(width: 16, height: 16)
+                            .frame(width: 16, height: 16)
                 }
                 
                 if configuration.isOn || isHovering {
@@ -62,7 +62,9 @@ struct TaskView: View {
             }
         }
         .padding(.vertical, 4)
+
     }
+
 }
 
 //#Preview {
