@@ -11,18 +11,30 @@ import Inject
 
 struct TaskListView: View {
     
-    
     @Query private var tasks: [Task]
     @State private var fillerText: String = ""
+    var selectedGroup: TaskGroup
+
+    private var filteredTasks: [Task] {
+    switch selectedGroup {
+    case .all:
+        return tasks
+    case .inbox, .today, .future:
+        return tasks.filter { $0.group == selectedGroup }
+    }
+}
+
+    
+
     @Environment(\.modelContext) var modelContext
+    
     var body: some View {
 
         VStack {
-
             ZStack {
                 // Gray background
                 RoundedRectangle(cornerRadius: 10)
-//                    .fill(Color.gray.opacity(0.1)) // Light gray background
+                   .fill(Color.gray.opacity(0.1)) // Light gray background
                     .frame(width: 100, height: 40) // Match TextField height
 
                 // TextField with placeholder
@@ -31,11 +43,13 @@ struct TaskListView: View {
                     if fillerText.isEmpty {
                         Text("meeting @ 2pm")
                             .foregroundColor(Color.gray) // Placeholder text color
-                            .padding(.horizontal, 25) // Align with input text
+                            .padding(.horizontal, 32)
+                            
                     }
                     
                     // task name text field
                     TextField("", text: $fillerText)
+                    
                         .textFieldStyle(PlainTextFieldStyle())
                         .padding(.horizontal, 16)
                         .padding(.vertical, 12)
@@ -49,14 +63,13 @@ struct TaskListView: View {
                         .onSubmit {
                             addTask(text: fillerText)
                         }
-
                 }
 
             }
             .padding(.horizontal)
             
             List {
-                ForEach(tasks) { task in
+                ForEach(filteredTasks) { task in
                     TaskView(
                             text: task.name,
                             onDelete: {
@@ -81,16 +94,21 @@ struct TaskListView: View {
 
     
     private func addTask(text: String) {
-        guard !fillerText.isEmpty else { return }
-        
-        let newTask = Task(name: text)
-        modelContext.insert(newTask)
-        fillerText = ""
-    }
+    guard !fillerText.isEmpty else { return }
+    
+    // When adding a task, always set its group to the current selected group
+    // If we're in "all", use inbox as default
+    let taskGroup = selectedGroup == .all ? .inbox : selectedGroup
+    let newTask: Task = Task(name: text, group: taskGroup)
+    modelContext.insert(newTask)
+    fillerText = ""
+    print("Current selectedGroup: \(selectedGroup), Added task '\(text)' to group '\(taskGroup)'")
+}
+
     
     private func deleteTask(at offsets: IndexSet) {
             for index in offsets {
-                let task = tasks[index]
+                let task = filteredTasks[index]
                 modelContext.delete(task) // Delete the task from the model context
             }
         }
@@ -100,9 +118,9 @@ struct TaskListView: View {
     
 }
 
-#Preview {
-    TaskListView()
-        .modelContainer(for: Task.self)
-}
+//#Preview {
+//    TaskListView()
+//        .modelContainer(for: Task.self)
+//}
 
 // End of file. No additional code.

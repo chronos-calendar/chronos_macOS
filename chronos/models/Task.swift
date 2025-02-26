@@ -14,10 +14,16 @@ class Task {
     var id: UUID
     var name: String
     var isCompleted: Bool
-    
-    init(name: String, isCompleted: Bool = false) {
+    var group: TaskGroup?
+
+    init(name: String, isCompleted: Bool = false, group: TaskGroup = .inbox) {
         self.id = UUID()
         self.name = name
         self.isCompleted = isCompleted
+        self.group = group
     }
+}
+
+enum TaskGroup: String, CaseIterable, Codable {
+    case all, inbox, today, future
 }
