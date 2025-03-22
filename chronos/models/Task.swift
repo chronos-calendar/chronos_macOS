@@ -6,7 +6,6 @@
 //
 import Foundation
 import SwiftData
-
 // Remove CoreData imports and implementation
 // Add SwiftData model
 @Model

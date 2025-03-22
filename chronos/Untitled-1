@@ -1,0 +1,217 @@
+[Open in app](https://rsci.app.link/?%24canonical_url=https%3A%2F%2Fmedium.com%2Fp%2Fe1b32446675b&%7Efeature=LoOpenInAppButton&%7Echannel=ShowPostUnderUser&source=---top_nav_layout_nav-----------------------------------------)
+Sign up
+[Sign in](https://medium.com/m/signin?operation=login&redirect=https%3A%2F%2Fmedium.com%2F%40mijick%2Ffast-customisable-calendars-with-swiftui-e1b32446675b&source=post_page---top_nav_layout_nav-----------------------global_nav------------------)
+[Write](https://medium.com/m/signin?operation=register&redirect=https%3A%2F%2Fmedium.com%2Fnew-story&source=---top_nav_layout_nav-----------------------new_post_topnav------------------)
+Sign up
+[Sign in](https://medium.com/m/signin?operation=login&redirect=https%3A%2F%2Fmedium.com%2F%40mijick%2Ffast-customisable-calendars-with-swiftui-e1b32446675b&source=post_page---top_nav_layout_nav-----------------------global_nav------------------)
+
+# Fast & Customizable Calendars with SwiftUI
+
+[Mijick](https://medium.com/@mijick?source=post_page---byline--e1b32446675b---------------------------------------)
+[Follow](https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fsubscribe%2Fuser%2F52357691732a&operation=register&redirect=https%3A%2F%2Fmedium.com%2F%40mijick%2Ffast-customisable-calendars-with-swiftui-e1b32446675b&user=Mijick&userId=52357691732a&source=post_page-52357691732a--byline--e1b32446675b---------------------post_header------------------)
+--
+Listen
+Share
+Developing iOS apps is an extensive process that requires a huge amount of time. Fortunately, SwiftUI offers many built-in objects, such as buttons or scroll view, which in theory make our job much easier. However, their limited customization options often force us to make a tough decision — either adapt our UI to the native elements or extend the production process by implementing a component from scratch. Fortunately, in situations like this, open-source libraries often come to our rescue and today we would like to talk about one of them.
+Imagine a situation in which we are faced with the need to insert a calendar into one of our screens. The specification says that the calendar should allow us to select a date range, the month view should be displayed in red and the black monkeys are supposed to dance in the day view (ah, those crazy clients!). Therefore, we are forced to implement the calendar from the scratch; writing all its logic (since SwiftUI objects are closed), views, tests…. Sounds very time-consuming, doesn’t it? Fortunately, using open — source libraries we can fix this problem quite smoothly.
+
+## MijickCalendarView
+MijickCalendarView contains a number of features, to make the process of creating calendar view easy and fast:
+- Total freedom in customizing elements,
+- Ability to easily change the calendar language and other settings
+- Possibility of adding and changing animations
+
+## Integration into the Project
+MijickCalendarView can be easily integrated into your project using:
+- Swift Package Manager
+
+```
+dependencies: [    .package(url: "https://github.com/Mijick/CalendarView.git", branch(“main”))]
+```
+
+- Cocoapods
+
+```
+pod 'MijickCalendarView'
+```
+
+## Usage
+To start using the library, simply import it by
+
+```
+import MijickCalendarView
+```
+
+And then create a view using MCalendarView. Depending on your goals you can choose to work with a specific date or a selected date range by using selectedDate or selectedRange.
+
+```
+selectedDate
+```
+
+
+```
+selectedRange
+```
+
+
+```
+struct ContentView: View {    @State private var selectedDate: Date? = nil    @State private var selectedRange: MDateRange? = .init()    var body: some View {        MCalendarView(selectedDate: $selectedDate, selectedRange: $selectedRange, configBuilder: configureCalendar)    }}
+```
+
+And also you can customize different properties like paddings, start dates and month, scroll events etc with a method configureCalendar
+
+```
+configureCalendar
+```
+
+
+```
+extension ContentView {    func configureCalendar(_ config: CalendarConfig) -> CalendarConfig {        config            .daysHorizontalSpacing(8)            .daysVerticalSpacing(20)            .monthsBottomPadding(20)            .monthsTopPadding(40)    }}
+```
+
+As a result we will get a minimal implementation example of a calendar with the MijickCalendarView library.
+
+## Customization
+So how we can implement custom views? The functionality of library includes a flexible constructor for UI customization and also it includes a custom views builder for:
+- Day of the week
+- Month
+- Day of the month
+Now, let’s try to create a custom UI for a weekday with orange background.
+In the configureCalendar method, there is a constructor that allows you to provide a custom view for the weekday:
+
+```
+configureCalendar
+```
+
+
+```
+.dayView { currentDate, isCurrentMonth, selectedDate, selectedRange -> DayView in    return СustomDayView(date: date, isCurrentMonth: isCurrentMonth, selectedDate: selectedDate, selectedRange: selectedRange) }
+```
+
+This method requires a custom object of a type DayView to be returned
+
+```
+DayView
+```
+
+Let’s create a CustomDayView
+Firstly, we need to create a structure that implements the DayView protocol. This requires us to include the following properties:
+
+```
+DayView
+```
+
+- date: current date value for the view.
+- isCurrentMonth: an indication of whether this is the current month.
+- selectedDate: a value that allows changes to the selected date to be tracked.
+- selectedRange: a value that allows changes to the selected date range to be tracked.
+
+```
+struct СustomDayView: DayView {    let date: Date    let isCurrentMonth: Bool    let selectedDate: Binding<Date?>?    let selectedRange: Binding<MDateRange?>?}
+```
+
+Additionally, if we look closely, we notice that DayView already has a default implementation for all UI methods.
+
+```
+DayView
+```
+
+To replace the standard UI implementation, you need to rewrite the func createDayLabel() -> AnyView function.
+
+```
+func createDayLabel() -> AnyView
+```
+
+To override the standard implementation of the UI element, we need to replace one (of all of) the selected method(s) — createContent, createDayLabel, createSelectionView, createRangeSelectionView. Within this article, we shall focus on the createDayLabel:
+
+```
+createContent
+```
+
+
+```
+createDayLabel
+```
+
+
+```
+createSelectionView
+```
+
+
+```
+createRangeSelectionView
+```
+
+
+```
+createDayLabel
+```
+
+
+```
+extension СustomDayView {    func createDayLabel() -> AnyView {        ZStack {            createBackgroundView()            createDayLabelText()         }        .erased() // cast to AnyView    } }private extension СustomDayView {   func createBackgroundView() -> some View {        RoundedRectangle(cornerRadius: 4)            .fill(Color.orange)    }  func createDayLabelText() -> some View {        Text(getStringFromDay(format: "d"))            .font(.system(size: 17))            .foregroundColor(.white)    }}
+```
+
+Note: The erased() method is needed to cast the abstract some View to the AnyView type.
+
+```
+erased()
+```
+
+
+```
+AnyView
+```
+
+As a result, we get a calendar with a customized representation of the day.
+
+# Future Plans
+In the near future, we intend to add some interesting enhancements to our library:
+- Support for other types of calendars (Hebrew, Japanese, etc.)
+- Support for horizontal scrolling
+- Support for pagination
+
+# Hey, before you go!
+We are a young organisation of people developing open-source software. If you would like to support us and stay up to date with our new content:
+- Please consider clapping and following us on Medium 👏
+- Follow us X | [GitHub](https://github.com/Mijick)
+- Say hello to us at [team@mijick.com](mailto:team@mijick.com)
+[X](https://twitter.com/MijickTeam)
+[GitHub](https://github.com/Mijick)
+[team@mijick.com](mailto:team@mijick.com)
+[Swiftui](https://medium.com/tag/swiftui?source=post_page-----e1b32446675b---------------------------------------)
+[Swift](https://medium.com/tag/swift?source=post_page-----e1b32446675b---------------------------------------)
+[Programming](https://medium.com/tag/programming?source=post_page-----e1b32446675b---------------------------------------)
+[Mobile App Development](https://medium.com/tag/mobile-app-development?source=post_page-----e1b32446675b---------------------------------------)
+[App Development](https://medium.com/tag/app-development?source=post_page-----e1b32446675b---------------------------------------)
+--
+--
+[Written by Mijick](https://medium.com/@mijick?source=post_page---post_author_info--e1b32446675b---------------------------------------)
+
+## Written by Mijick
+[102 Followers](https://medium.com/@mijick/followers?source=post_page---post_author_info--e1b32446675b---------------------------------------)
+[7 Following](https://medium.com/@mijick/following?source=post_page---post_author_info--e1b32446675b---------------------------------------)
+On a mission to make software that feels like second nature. With love for simplicity. [https://github.com/Mijick](https://github.com/Mijick)
+
+## No responses yet
+[Help](https://help.medium.com/hc/en-us?source=post_page-----e1b32446675b---------------------------------------)
+Help
+[Status](https://medium.statuspage.io/?source=post_page-----e1b32446675b---------------------------------------)
+Status
+[About](https://medium.com/about?autoplay=1&source=post_page-----e1b32446675b---------------------------------------)
+About
+[Careers](https://medium.com/jobs-at-medium/work-at-medium-959d1a85284e?source=post_page-----e1b32446675b---------------------------------------)
+Careers
+[Press](mailto:pressinquiries@medium.com)
+Press
+[Blog](https://blog.medium.com/?source=post_page-----e1b32446675b---------------------------------------)
+Blog
+[Privacy](https://policy.medium.com/medium-privacy-policy-f03bf92035c9?source=post_page-----e1b32446675b---------------------------------------)
+Privacy
+[Terms](https://policy.medium.com/medium-terms-of-service-9db0094a1e0f?source=post_page-----e1b32446675b---------------------------------------)
+Terms
+[Text to speech](https://speechify.com/medium?source=post_page-----e1b32446675b---------------------------------------)
+Text to speech
+[Teams](https://medium.com/business?source=post_page-----e1b32446675b---------------------------------------)
+Teams
