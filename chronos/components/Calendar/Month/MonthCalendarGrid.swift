@@ -15,7 +15,7 @@ struct MonthCalendarGridView: View {
     var shouldScrollToToday: Bool = true
     
     private let calendar = Calendar.current
-    private let monthHeight: CGFloat = 6 * 100 // Approximate height of a month (6 rows * cell height)
+    private let monthHeight: CGFloat = 5 * 100 // Approximate height of a month (5 rows * cell height)
     
     // State to track if initial scroll has completed
     @State private var initialScrollComplete = false
@@ -95,12 +95,12 @@ struct MonthCalendarGridView: View {
             return []
         }
         
-        // Generate 4 weeks before today's week
+        // Generate 2 weeks before today's week
         var allWeeks: [[Date]] = []
         var currentWeekStart = todayWeekStart
         
-        // Add 4 weeks before today's week
-        for _ in 0..<4 {
+        // Add 2 weeks before today's week
+        for _ in 0..<2 {
             guard let previousWeekStart = calendar.date(byAdding: .day, value: -7, to: currentWeekStart) else {
                 break
             }
@@ -111,9 +111,9 @@ struct MonthCalendarGridView: View {
         // Add today's week
         allWeeks.append(generateWeek(from: todayWeekStart))
         
-        // Add 4 weeks after today's week
+        // Add 2 weeks after today's week
         currentWeekStart = todayWeekStart
-        for _ in 0..<4 {
+        for _ in 0..<2 {
             guard let nextWeekStart = calendar.date(byAdding: .day, value: 7, to: currentWeekStart) else {
                 break
             }
