@@ -26,19 +26,28 @@ struct MonthDayCell: View {
         VStack(alignment: .leading, spacing: 0) {
             // Day number row
             HStack(alignment: .top) {
-                Text(String(day))
-                    .font(.system(size: 14))
-                    .fontWeight(isToday ? .semibold : .regular)
-                    .foregroundColor(dayNumberColor)
-                    .padding(.top, 6)
-                    .padding(.leading, 8)
+                ZStack {
+                    if isToday {
+                        Circle()
+                            .fill(Color.red)
+                            .frame(width: 24, height: 24)
+                    }
+                    
+                    Text(String(day))
+                        .font(.system(size: 14))
+                        .fontWeight(isFirstDayOfMonth || isToday ? .semibold : .regular)
+                        .foregroundColor(dayNumberColor)
+                }
+                .padding(.top, 6)
+                .padding(.leading, 8)
                 
                 Spacer()
                 
                 // Month indicator for first day of month
-                if isFirstDayOfMonth && !isCurrentMonth {
+                if isFirstDayOfMonth {
                     Text(getMonthAbbreviation())
                         .font(.system(size: 10))
+                        .fontWeight(.semibold)
                         .foregroundColor(.gray.opacity(0.8))
                         .padding(.top, 6)
                         .padding(.trailing, 8)
@@ -57,9 +66,9 @@ struct MonthDayCell: View {
     // MARK: - Computed Properties
     private var dayNumberColor: Color {
         if isToday {
-            return .blue
+            return .white
         } else if isCurrentMonth {
-            return .black
+            return .black.opacity(0.8)
         } else {
             return .gray.opacity(0.6)
         }
