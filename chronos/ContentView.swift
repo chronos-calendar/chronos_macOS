@@ -9,7 +9,6 @@ struct ContentView: View {
     @State private var sidebarWidth: CGFloat = 300
     @State private var isDragging = false
     
-    // Sample events for demonstration - you'll want to replace this with actual data from SwiftData
     @State private var events: [CalendarEvent] = [
         CalendarEvent(title: "Team Meeting", startTime: Date(), endTime: Date().addingTimeInterval(3600), isCompleted: false, type: .meeting),
         CalendarEvent(title: "Project Deadline", startTime: Date().addingTimeInterval(86400), endTime: Date().addingTimeInterval(90000), isCompleted: false, type: .deadline),
@@ -18,10 +17,13 @@ struct ContentView: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            // First pane - task list (resizable)
+            // Sidebar with task list
             VStack {
                 TabsView(selectedTab: $selectedGroup)
+                    .padding(.top, 20)
                 TaskListView(selectedGroup: selectedGroup)
+                    .frame(width: sidebarWidth)
+                    .background(Color.white)
             }
             .frame(maxHeight: .infinity)
             .background(Color.white)
@@ -48,10 +50,19 @@ struct ContentView: View {
                         }
                 )
             
-            // Second pane - Calendar (flexible width)
-            CalendarView(events: events)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.white)
+            // Calendar view
+            VStack(alignment: .leading) {
+                Text("Calendar")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .padding(.top, 20)
+                    .padding(.leading, 16)
+                
+                MonthlyCalendar(events: events)
+                    .padding(16)
+            }
+            .frame(minWidth: 500, maxHeight: .infinity)
+            .background(Color.white)
         }
         .enableInjection()
         .background(Color.white)

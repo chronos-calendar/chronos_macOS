@@ -3,36 +3,22 @@ import Foundation
 
 struct CalendarMonthHeader: View {
     @Binding var currentMonthDate: Date
-    let onPreviousMonth: () -> Void
-    let onNextMonth: () -> Void
     
     var body: some View {
         HStack {
-            Text(getFormattedMonthYear())
-                .font(.system(size: 16, weight: .semibold))
+            Text(getFormattedDate(from: currentMonthDate))
                 .foregroundColor(.black)
+                .font(.system(size: 16, weight: .semibold))
             
             Spacer()
-            
-            HStack(spacing: 16) {
-                Button(action: onPreviousMonth) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.gray)
-                }
-                
-                Button(action: onNextMonth) {
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(.gray)
-                }
-            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
     }
     
-    private func getFormattedMonthYear() -> String {
+    private func getFormattedDate(from date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
-        return formatter.string(from: currentMonthDate)
+        return formatter.string(from: date)
     }
 }
