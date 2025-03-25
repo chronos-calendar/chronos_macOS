@@ -33,30 +33,9 @@
 		248F754E2D5D642500073946 /* chronosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = chronosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		243281D12D63FBFD00017B5D /* Exceptions for "chronos" folder in "chronosTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				components/TabsView.swift,
-			);
-			target = 248F75432D5D642500073946 /* chronosTests */;
-		};
-		243281D22D63FBFD00017B5D /* Exceptions for "chronos" folder in "chronosUITests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				components/TabsView.swift,
-			);
-			target = 248F754D2D5D642500073946 /* chronosUITests */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		248F75352D5D642300073946 /* chronos */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				243281D12D63FBFD00017B5D /* Exceptions for "chronos" folder in "chronosTests" target */,
-				243281D22D63FBFD00017B5D /* Exceptions for "chronos" folder in "chronosUITests" target */,
-			);
 			path = chronos;
 			sourceTree = "<group>";
 		};
