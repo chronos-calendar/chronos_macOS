@@ -1,13 +1,17 @@
 import SwiftUI
+import SwiftData
 
 struct EventModal: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     
     @State private var title: String = ""
     @State private var startDate: Date = .now
     @State private var endDate: Date = .now
     @State private var eventType: EventType = .task
     @State private var notifyMembers: Bool = false
+    @State private var showNewParticipantField: Bool = false
+    @State private var newParticipantEmail: String = ""
     
     @State private var participants: [Participant] = [
         Participant(name: "Adrian", initial: "A", color: .purple),
@@ -77,7 +81,6 @@ struct EventModal: View {
                             .foregroundColor(Color(red: 90/255, green: 90/255, blue: 90/255, opacity: 0.9))
                     }
                     .padding(8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .background(
                     RoundedRectangle(cornerRadius: 8)
@@ -154,35 +157,54 @@ struct EventModal: View {
                     Text("\(participants.count)")
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Menu {
-                        ForEach(participants) { participant in
-                            Button(action: {
-                                // Add toggle selection logic here
-                            }) {
-                                HStack {
-                                    Circle()
-                                        .fill(participant.color)
-                                        .frame(width: 16, height: 16)
-                                        .overlay(
-                                            Text(participant.initial)
-                                                .foregroundStyle(.white)
-                                                .font(.system(size: 10, weight: .medium))
-                                        )
-                                    Text(participant.name)
-                                    Spacer()
-                                    // Add checkmark for selected participants
-                                }
-                            }
-                        }
+                    Button {
+                        showNewParticipantField.toggle()
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundStyle(.blue)
+                            .font(.system(size: 20))
                     }
-                        
-                        Divider()
-                        
-                        Button("Add New Participant") {
-                            // Add new participant action
-                        }
-                    }
+                    .buttonStyle(.plain)
                 }
+                
+                // New Participant Input Field
+                if showNewParticipantField {
+                    HStack {
+                        TextField("Enter email address", text: $newParticipantEmail)
+                            .textFieldStyle(.plain)
+                            .padding(8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.white)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                            )
+                        
+                        Button {
+                            // Add participant logic will be added later
+                            showNewParticipantField = false
+                            newParticipantEmail = ""
+                        } label: {
+                            Text("Add")
+                                .foregroundStyle(.blue)
+                                .fontWeight(.medium)
+                        }
+                        .buttonStyle(.plain)
+                        
+                        Button {
+                            showNewParticipantField = false
+                            newParticipantEmail = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.vertical, 4)
+                }
+                
                 HStack(spacing: 4) {
                     ForEach(participants) { participant in
                         HStack(spacing: 4) {
@@ -208,71 +230,49 @@ struct EventModal: View {
             .background(Color.gray.opacity(0.2))
             .cornerRadius(8)
             
-            // Invite Team Members
-            HStack(spacing: 12) {
-                HStack(spacing: -8) {
-                    ForEach(0..<3) { _ in
-                        Circle()
-                            .fill(Color(nsColor: .controlBackgroundColor))
-                            .frame(width: 24, height: 24)
-                            .overlay(
-                                Image(systemName: "person.fill")
-                                    .foregroundStyle(.blue)
-                                    .font(.caption)
-                            )
-                    }
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Invite Team Members")
-                        .fontWeight(.medium)
-                    Text("Invite your teammates to this event")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                Text("+")
-                    .font(.system(size: 20))
-                    .foregroundStyle(.secondary)
-            }
-            .padding(12)
-            .background(Color(nsColor: .controlBackgroundColor).opacity(0.5))
-            .cornerRadius(12)
-            
             // Notify Members Toggle
             Toggle("Notify members", isOn: $notifyMembers)
+                .foregroundColor(Color(red: 90/255, green: 90/255, blue: 90/255, opacity: 0.9))
                 .toggleStyle(.checkbox)
             
             Spacer()
             
             // Bottom Buttons
-            HStack(spacing: 12) {
-                Button("Cancel") {
-                    dismiss()
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(Color(nsColor: .controlBackgroundColor))
-                .cornerRadius(12)
-                .foregroundStyle(.primary)
-                
+            HStack {
+                Spacer()
                 Button("Create Event") {
-                    // Add event creation logic if needed
+                    createEvent()
                 }
-                .frame(maxWidth: .infinity)
+                .frame(width: 200)
                 .padding(.vertical, 12)
-                .background(.black)
-                .foregroundStyle(.white)
+                .background(Color.green) // Use Color.green for a solid green background
                 .cornerRadius(12)
+                .foregroundColor(.white) // Text color should be white
+                Spacer()
             }
+            .padding(.top, 20) // Optional: Add spacing above the button if necessary
         }
         .padding(24)
         .frame(width: 460)
         .background(.white)
     }
+    
+    private func createEvent() {
+        let event = CalendarEvent(
+            title: title,
+            startTime: startDate,
+            endTime: endDate,
+            isCompleted: false,
+            isAllDay: false,
+            type: eventType
+        )
+        
+        modelContext.insert(event)
+        dismiss()
+    }
 }
 
-struct EventModal_Previews: PreviewProvider {
-    static var previews: some View {
-        EventModal()
-    }
+#Preview {
+    EventModal()
+        .modelContainer(for: CalendarEvent.self, inMemory: true)
 }
