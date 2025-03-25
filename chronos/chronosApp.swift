@@ -13,8 +13,10 @@ struct chronosApp: App {
         #endif
         
         do {
-            // Initialize container with Task model
-            container = try ModelContainer(for: Task.self)
+            // Initialize container with both Task and CalendarEvent models
+            let schema = Schema([Task.self, CalendarEvent.self])
+            let config = ModelConfiguration("chronos")
+            container = try ModelContainer(for: schema, configurations: [config])
         } catch {
             fatalError("Could not initialize ModelContainer: \(error)")
         }
@@ -28,5 +30,3 @@ struct chronosApp: App {
         }
     }
 }
-
-// End of file. No additional code.

@@ -6,6 +6,8 @@ struct ContentView: View {
     @ObserveInjection var inject
     @State private var selectedGroup: TaskGroup = .all
     @State private var selectedDate: Date? = nil
+    @State private var sidebarWidth: CGFloat = 300
+    @State private var isDragging = false
     
     // Sample events for demonstration - you'll want to replace this with actual data from SwiftData
     @State private var events: [CalendarEvent] = [
@@ -15,31 +17,41 @@ struct ContentView: View {
     ]
     
     var body: some View {
-        HSplitView {
-            // First pane - task list (fixed width)
+        HStack(spacing: 0) {
+            // First pane - task list (resizable)
             VStack {
                 TabsView(selectedTab: $selectedGroup)
-                    .padding(.top, 20)
                 TaskListView(selectedGroup: selectedGroup)
-                    .frame(width: 300) 
-                    .background(Color.white)
             }
             .frame(maxHeight: .infinity)
             .background(Color.white)
             
-            // Second pane - Monthly Calendar (flexible width)
-            VStack(alignment: .leading) {
-                Text("Calendar")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .padding(.top, 20)
-                    .padding(.leading, 16)
-                
-                MonthlyCalendar(events: events)
-                    .padding(16)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.white)
+            // Resizable divider
+            Rectangle()
+                .fill(Color.gray.opacity(0.2))
+                .frame(width: 1)
+                .overlay(
+                    Rectangle()
+                        .fill(isDragging ? .blue.opacity(0.5) : .clear)
+                        .frame(width: 8)
+                        .contentShape(Rectangle())
+                )
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            isDragging = true
+                            let newWidth = sidebarWidth + value.translation.width
+                            sidebarWidth = min(max(200, newWidth), 400)
+                        }
+                        .onEnded { _ in
+                            isDragging = false
+                        }
+                )
+            
+            // Second pane - Calendar (flexible width)
+            CalendarView(events: events)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.white)
         }
         .enableInjection()
         .background(Color.white)
