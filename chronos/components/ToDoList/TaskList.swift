@@ -6,7 +6,8 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
+import Inject
 
 struct TaskListView: View {
     
@@ -29,7 +30,7 @@ struct TaskListView: View {
     
     var body: some View {
 
-        VStack(spacing: 0) {
+        VStack {
             ZStack {
                 // Gray background
                 RoundedRectangle(cornerRadius: 10)
@@ -86,8 +87,8 @@ struct TaskListView: View {
 
         }
 
-        .background(Color.chronosBackground)
-
+        .enableInjection()
+       
     }
 
 

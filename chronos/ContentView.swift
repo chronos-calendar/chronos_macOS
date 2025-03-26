@@ -6,8 +6,8 @@ struct ContentView: View {
     @ObserveInjection var inject
     @State private var selectedGroup: TaskGroup = .all
     @State private var selectedDate: Date? = nil
+    @State private var showingEventModal = false
     
-    // Sample events for demonstration - you'll want to replace this with actual data from SwiftData
     @State private var events: [CalendarEvent] = [
         CalendarEvent(title: "Team Meeting", startTime: Date(), endTime: Date().addingTimeInterval(3600), isCompleted: false, type: .meeting),
         CalendarEvent(title: "Project Deadline", startTime: Date().addingTimeInterval(86400), endTime: Date().addingTimeInterval(90000), isCompleted: false, type: .deadline),
@@ -15,23 +15,39 @@ struct ContentView: View {
     ]
     
     var body: some View {
-        HSplitView {
-            // First pane - task list (resizable)
-            VStack {
-                TabsView(selectedTab: $selectedGroup)
-                TaskListView(selectedGroup: selectedGroup)
-            }
-            .frame(maxHeight: .infinity)
-            .background(Color.white)
-            
-            
-            // Second pane - Calendar (flexible width)
-            CalendarView(events: events)
+        ZStack {
+            HSplitView {
+                VStack {
+                    TabsView(selectedTab: $selectedGroup)
+                    TaskListView(selectedGroup: selectedGroup)
+                }
+                .frame(maxHeight: .infinity)
+
+                CalendarView(
+                    events: events,
+                    onDateSelected: {
+                        showingEventModal = true
+                    }
+                )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.white)
+            }
+            .enableInjection()
+            
+            if showingEventModal {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        showingEventModal = false
+                    }
+                
+                EventModal()
+                    .frame(width: 460)
+                    .background(.white)
+                    .cornerRadius(12)
+                    .shadow(radius: 10)
+                    .padding()
+            }
         }
-        .enableInjection()
-        .background(Color.white)
     }
 }
 

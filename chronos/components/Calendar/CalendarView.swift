@@ -75,38 +75,14 @@ extension CalendarViewType {
 }
 
 struct CalendarView: View {
-    @State private var selectedViewType: CalendarViewType = .monthly
     let events: [CalendarEvent]
+    var onDateSelected: () -> Void
     
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                CalendarDropdownButton(
-                    selectedViewType: selectedViewType,
-                    action: { newType in
-                        withAnimation {
-                            selectedViewType = newType
-                        }
-                    }
-                )
-                
-                Spacer()
-            }
-            .padding(.horizontal)
-            .padding(.top, 8)
-            
-            Group {
-                switch selectedViewType {
-                case .monthly:
-                    MonthlyCalendar(events: events)
-                case .weekly:
-                    WeeklyCalendar(events: events)
-                case .daily:
-                    DailyCalendar(events: events)
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
+        MonthView(
+            events: events,
+            onDateSelected: onDateSelected
+        )
     }
 }
 
