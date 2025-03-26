@@ -10,7 +10,6 @@ struct MonthDayCell: View {
     let events: [CalendarEvent]
     let cellWidth: CGFloat
     let cellHeight: CGFloat
-    let onDateSelected: () -> Void
     @State private var showEventModal = false
     private let calendar = Calendar.current
     
@@ -59,17 +58,16 @@ struct MonthDayCell: View {
             
             Spacer()
         }
-
+        
         .frame(width: cellWidth, height: cellHeight)
         .background(cellBackground)
         .overlay(cellBorder)
         .onTapGesture(count: 2){
-            onDateSelected()
+            showEventModal = true
         }
-        .sheet(isPresented: $showEventModal){
+        .sheet(isPresented: $showEventModal) {
             EventModal()
         }
-        
     }
     
     // MARK: - Computed Properties
