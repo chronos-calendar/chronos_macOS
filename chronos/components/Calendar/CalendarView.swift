@@ -100,7 +100,7 @@ struct CalendarView: View {
                 case .monthly:
                     MonthlyCalendar(events: events)
                 case .weekly:
-                    WeeklyCalendar(events: events)
+                    WeeklyCalendarView(events: events)
                 case .daily:
                     DailyCalendar(events: events)
                 }
