@@ -10,10 +10,10 @@ import SwiftData
 
 // Event type enum to categorize different events
 enum EventType: String, Codable {
-    case meeting = "Meeting"
-    case deadline = "Deadline"
-    case reminder = "Reminder"
-    case task = "Task"
+    case meeting
+    case deadline
+    case reminder
+    case task
 }
 
 @Model
