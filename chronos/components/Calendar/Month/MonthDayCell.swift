@@ -81,7 +81,7 @@ struct MonthDayCell: View {
         }
     }
     
-    private var cellBackground: some View {
+    private var cellBackground: some View { 
         Group {
             if isToday {
                 Color.blue.opacity(0.1)

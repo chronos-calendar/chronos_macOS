@@ -206,34 +206,29 @@ struct EventModal: View {
                                     LazyVStack(alignment: .leading, spacing: 0) {
                                         ForEach(searchCompleter.results, id: \.self) { result in
                                             Button {
-                                                // --- *** MODIFICATION START *** ---
-                                                // 1. Determine the full selected location text
+                                                // Updated implementation for handling suggestion selection
+                                                // 1. Store the selected location
                                                 let selectedLocation: String
                                                 if !result.subtitle.isEmpty {
                                                     selectedLocation = "\(result.title), \(result.subtitle)"
                                                 } else {
                                                     selectedLocation = result.title
                                                 }
-
-                                                // 2. Temporarily disable search completer
-                                                searchCompleter.shouldSearch = false
-
-                                                // 3. Update the location state variable
-                                                // This WILL trigger the .onChange above, but since
-                                                // shouldSearch is false, it won't update the queryFragment
-                                                location = selectedLocation
-
-                                                // 4. Explicitly hide and clear results
+                                                
+                                                // 2. Hide results immediately
                                                 searchCompleter.showResults = false
-                                                searchCompleter.results = [] // Clear results immediately
-
-                                                // 5. Re-enable search completer AFTER the state update cycle
-                                                // Using DispatchQueue.main.async ensures this runs slightly later
-                                                DispatchQueue.main.async {
+                                                searchCompleter.results = []
+                                                
+                                                // 3. Disable search to prevent onChange handling
+                                                searchCompleter.shouldSearch = false
+                                                
+                                                // 4. Update location text
+                                                location = selectedLocation
+                                                
+                                                // 5. Re-enable search after a delay
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                                     searchCompleter.shouldSearch = true
                                                 }
-                                                // --- *** MODIFICATION END *** ---
-
                                             } label: {
                                                 VStack(alignment: .leading) {
                                                     Text(result.title)
