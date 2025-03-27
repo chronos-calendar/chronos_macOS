@@ -54,7 +54,7 @@ extension WeeklyCalendarView {
     /// A horizontal row indicating each day of the current week
     private var daysOfWeekHeader: some View {
         HStack(spacing: 0) {
-            // Empty spacer for the time column
+            // Time column spacer
             Text("")
                 .frame(width: 50)
             
@@ -64,12 +64,15 @@ extension WeeklyCalendarView {
                     Text(dayOfWeekFormatter.string(from: date)) // e.g. "Mon", "Tue"
                         .font(.subheadline)
                         .foregroundColor(.black)
+                        .multilineTextAlignment(.center)
                     
                     Text("\(calendar.component(.day, from: date))") // e.g. 14, 15
                         .font(.headline)
                         .foregroundColor(.black)
                         .fontWeight(calendar.isDateInToday(date) ? .bold : .regular)
+                        .multilineTextAlignment(.center)
                 }
+                // Give each day's header a flexible width, centered
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 4)
                 .background(
@@ -82,10 +85,35 @@ extension WeeklyCalendarView {
     /// The main scrollable portion of the view, containing time labels and daily columns
     private var scrollableTimeline: some View {
         ScrollView(showsIndicators: true) {
-            HStack(spacing: 0) {
-                timeLabelsColumn
-                ForEach(weekDates, id: \.self) { date in
-                    DayColumnView(date: date, allEvents: events)
+            ZStack(alignment: .topLeading) {
+                HStack(spacing: 0) {
+                    timeLabelsColumn
+                    ForEach(weekDates.indices, id: \.self) { index in
+                        DayColumnView(date: weekDates[index], allEvents: events)
+                            // Each day column also gets flexible width
+                            .frame(maxWidth: .infinity)
+                            // Keep or restore any vertical line overlay if previously added:
+                            .overlay(alignment: .trailing) {
+                                if index < weekDates.count - 1 {
+                                    Rectangle()
+                                        .fill(Color.gray.opacity(0.3))
+                                        .frame(width: 1)
+                                }
+                            }
+                    }
+                }
+                // The geometry-based red time indicator remains the same
+                GeometryReader { proxy in
+                    let now = Date()
+                    let hourNow = calendar.component(.hour, from: now)
+                    let minuteNow = calendar.component(.minute, from: now)
+                    let offsetY = (CGFloat(hourNow) + CGFloat(minuteNow) / 60.0) * 50.0
+
+                    Rectangle()
+                        .fill(Color.red)
+                        .frame(width: proxy.size.width - 50)
+                        .frame(height: 2)
+                        .offset(x: 50, y: offsetY)
                 }
             }
         }
@@ -101,6 +129,10 @@ extension WeeklyCalendarView {
                     Text(timeFormatter.string(from: date)) // e.g. "12 AM", "1 PM"
                         .font(.caption)
                         .foregroundColor(.black)
+                        // ADD:
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .frame(width: 40, alignment: .trailing)
                 }
                 .frame(height: 50)
             }
@@ -178,12 +210,12 @@ fileprivate struct DayColumnView: View {
     let allEvents: [CalendarEvent]
     
     private let calendar = Calendar.current
-    
+
     var body: some View {
         VStack(spacing: 0) {
             ForEach(0..<24) { hour in
                 Rectangle()
-                    .fill(Color.gray.opacity(0.06))
+                    .fill(Color.white)
                     .frame(height: 50)
                     .overlay(
                         Rectangle()
