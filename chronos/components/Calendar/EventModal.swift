@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import MapKit
 
 struct EventModal: View {
     @Environment(\.dismiss) private var dismiss
@@ -27,6 +28,10 @@ struct EventModal: View {
     @State private var participants: [Participant] = [
         
     ]
+    
+    @State private var searchResults: [MKLocalSearchCompletion] = []
+    @State private var showLocationResults = false
+    @StateObject private var searchCompleter = LocationSearchCompleter()
     
     private var isToday: (Date) -> Bool = { date in
         Calendar.current.isDateInToday(date)
@@ -164,14 +169,62 @@ struct EventModal: View {
                     Text("Location")
                         .foregroundStyle(.secondary)
                         .font(.system(size: 13))
-                    HStack {
-                        Image(systemName: "mappin")
-                        TextField("Add location", text: $location)
-                            .textFieldStyle(.plain)
+                    
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack {
+                            Image(systemName: "mappin")
+                                .foregroundColor(.primary)
+                            TextField("Add location", text: $location)
+                                .textFieldStyle(.plain)
+                                .font(.system(size: 14, weight: .medium))
+                                .onChange(of: location) { _, newValue in
+                                    if !newValue.isEmpty {
+                                        searchCompleter.queryFragment = newValue
+                                        showLocationResults = true
+                                    } else {
+                                        showLocationResults = false
+                                    }
+                                }
+                        }
+                        .padding(8)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+                        
+                        if showLocationResults && !searchCompleter.results.isEmpty {
+                            ScrollView {
+                                LazyVStack(alignment: .leading, spacing: 0) {
+                                    ForEach(searchCompleter.results, id: \.self) { result in
+                                        Button {
+                                            location = result.title
+                                            showLocationResults = false
+                                        } label: {
+                                            VStack(alignment: .leading) {
+                                                Text(result.title)
+                                                    .font(.system(size: 14))
+                                                if !result.subtitle.isEmpty {
+                                                    Text(result.subtitle)
+                                                        .font(.system(size: 12))
+                                                        .foregroundColor(.secondary)
+                                                }
+                                            }
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.vertical, 8)
+                                            .padding(.horizontal, 12)
+                                        }
+                                        .buttonStyle(.plain)
+                                        
+                                        if result != searchCompleter.results.last {
+                                            Divider()
+                                        }
+                                    }
+                                }
+                            }
+                            .frame(maxHeight: 200)
+                            .background(Color(nsColor: .windowBackgroundColor))
+                            .cornerRadius(8)
+                            .shadow(color: .black.opacity(0.15), radius: 8)
+                        }
                     }
-                    .padding(8)
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(8)
                 }
                 
                 // Updated Participants section
