@@ -51,6 +51,8 @@ struct EventModal: View {
             Color.black.opacity(0.3)
                 .ignoresSafeArea()
                 .onTapGesture {
+                    searchCompleter.showResults = false
+                    searchCompleter.results = []
                     dismiss()
                 }
             
@@ -168,7 +170,7 @@ struct EventModal: View {
                     Text("Location")
                         .foregroundStyle(.secondary)
                         .font(.system(size: 13))
-                    
+
                     VStack(alignment: .leading, spacing: 0) {
                         HStack {
                             Image(systemName: "mappin")
@@ -177,61 +179,95 @@ struct EventModal: View {
                                 .textFieldStyle(.plain)
                                 .font(.system(size: 14, weight: .medium))
                                 .onChange(of: location) { _, newValue in
-                                    if !newValue.isEmpty {
+                                    // Only update queryFragment if search is enabled
+                                    // This prevents updates triggered by selecting a suggestion
+                                    if searchCompleter.shouldSearch {
                                         searchCompleter.queryFragment = newValue
-                                    } else {
-                                        searchCompleter.showResults = false
                                     }
                                 }
                         }
                         .padding(8)
                         .background(Color.gray.opacity(0.2))
                         .cornerRadius(8)
-                        
+
+                        // --- Suggestions List ---
                         if searchCompleter.showResults && !searchCompleter.results.isEmpty {
-                            ScrollView {
-                                LazyVStack(alignment: .leading, spacing: 0) {
-                                    ForEach(searchCompleter.results, id: \.self) { result in
-                                        Button {
-                                            withAnimation(.easeOut(duration: 0.2)) {
+                            ZStack {
+                                // Background tap to dismiss (optional but good UX)
+                                Color.clear
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        searchCompleter.showResults = false
+                                        // Consider clearing results too if desired
+                                         searchCompleter.results = []
+                                    }
+
+                                ScrollView {
+                                    LazyVStack(alignment: .leading, spacing: 0) {
+                                        ForEach(searchCompleter.results, id: \.self) { result in
+                                            Button {
+                                                // --- *** MODIFICATION START *** ---
+                                                // 1. Determine the full selected location text
+                                                let selectedLocation: String
                                                 if !result.subtitle.isEmpty {
-                                                    location = "\(result.title), \(result.subtitle)"
+                                                    selectedLocation = "\(result.title), \(result.subtitle)"
                                                 } else {
-                                                    location = result.title
+                                                    selectedLocation = result.title
                                                 }
+
+                                                // 2. Temporarily disable search completer
+                                                searchCompleter.shouldSearch = false
+
+                                                // 3. Update the location state variable
+                                                // This WILL trigger the .onChange above, but since
+                                                // shouldSearch is false, it won't update the queryFragment
+                                                location = selectedLocation
+
+                                                // 4. Explicitly hide and clear results
                                                 searchCompleter.showResults = false
-                                            }
-                                        } label: {
-                                            VStack(alignment: .leading) {
-                                                Text(result.title)
-                                                    .font(.system(size: 14))
-                                                    .foregroundColor(.primary)
-                                                if !result.subtitle.isEmpty {
-                                                    Text(result.subtitle)
-                                                        .font(.system(size: 12))
-                                                        .foregroundColor(.secondary)
+                                                searchCompleter.results = [] // Clear results immediately
+
+                                                // 5. Re-enable search completer AFTER the state update cycle
+                                                // Using DispatchQueue.main.async ensures this runs slightly later
+                                                DispatchQueue.main.async {
+                                                    searchCompleter.shouldSearch = true
                                                 }
+                                                // --- *** MODIFICATION END *** ---
+
+                                            } label: {
+                                                VStack(alignment: .leading) {
+                                                    Text(result.title)
+                                                        .font(.system(size: 14))
+                                                        .foregroundColor(.primary)
+                                                    if !result.subtitle.isEmpty {
+                                                        Text(result.subtitle)
+                                                            .font(.system(size: 12))
+                                                            .foregroundColor(.secondary)
+                                                    }
+                                                }
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .padding(.vertical, 8)
+                                                .padding(.horizontal, 12)
                                             }
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding(.vertical, 8)
-                                            .padding(.horizontal, 12)
-                                        }
-                                        .buttonStyle(.plain)
-                                        
-                                        if result != searchCompleter.results.last {
-                                            Divider()
+                                            .buttonStyle(.plain)
+
+                                            if result != searchCompleter.results.last {
+                                                Divider()
+                                            }
                                         }
                                     }
                                 }
+                                .frame(maxHeight: 200)
+                                .background(Color(nsColor: .windowBackgroundColor)) // Use appropriate background
+                                .cornerRadius(8)
+                                .shadow(color: .black.opacity(0.15), radius: 8)
                             }
-                            .frame(maxHeight: 200)
-                            .background(Color(nsColor: .windowBackgroundColor))
-                            .cornerRadius(8)
-                            .shadow(color: .black.opacity(0.15), radius: 8)
+                            // Add zIndex if needed to ensure suggestions appear above other elements
+                            // .zIndex(1)
                         }
                     }
                 }
-                
+
                 // Updated Participants section
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {

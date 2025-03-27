@@ -2,27 +2,39 @@ import MapKit
 
 class LocationSearchCompleter: NSObject, ObservableObject {
     @Published var results: [MKLocalSearchCompletion] = []
+    @Published var showResults: Bool = false
+    @Published var shouldSearch: Bool = true
     
     private let searchCompleter = MKLocalSearchCompleter()
     
     var queryFragment: String = "" {
         didSet {
-            searchCompleter.queryFragment = queryFragment
-            showResults = !queryFragment.isEmpty
+            if shouldSearch && !queryFragment.isEmpty {
+                searchCompleter.queryFragment = queryFragment
+                showResults = true
+            } else {
+                showResults = false
+                results = []
+            }
         }
     }
-    
-    @Published var showResults: Bool = false
     
     override init() {
         super.init()
         searchCompleter.delegate = self
-        
-        // Configure to include POIs and addresses
         searchCompleter.resultTypes = [.pointOfInterest, .address, .query]
-        
-        // Set filter type to include POIs
         searchCompleter.filterType = .locationsAndQueries
+    }
+    
+    func disableSearch() {
+        shouldSearch = false
+        showResults = false
+        results = []
+        queryFragment = ""
+    }
+    
+    func enableSearch() {
+        shouldSearch = true
     }
 }
 
