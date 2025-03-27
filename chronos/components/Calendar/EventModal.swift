@@ -30,7 +30,6 @@ struct EventModal: View {
     ]
     
     @State private var searchResults: [MKLocalSearchCompletion] = []
-    @State private var showLocationResults = false
     @StateObject private var searchCompleter = LocationSearchCompleter()
     
     private var isToday: (Date) -> Bool = { date in
@@ -180,9 +179,8 @@ struct EventModal: View {
                                 .onChange(of: location) { _, newValue in
                                     if !newValue.isEmpty {
                                         searchCompleter.queryFragment = newValue
-                                        showLocationResults = true
                                     } else {
-                                        showLocationResults = false
+                                        searchCompleter.showResults = false
                                     }
                                 }
                         }
@@ -190,17 +188,24 @@ struct EventModal: View {
                         .background(Color.gray.opacity(0.2))
                         .cornerRadius(8)
                         
-                        if showLocationResults && !searchCompleter.results.isEmpty {
+                        if searchCompleter.showResults && !searchCompleter.results.isEmpty {
                             ScrollView {
                                 LazyVStack(alignment: .leading, spacing: 0) {
                                     ForEach(searchCompleter.results, id: \.self) { result in
                                         Button {
-                                            location = result.title
-                                            showLocationResults = false
+                                            withAnimation(.easeOut(duration: 0.2)) {
+                                                if !result.subtitle.isEmpty {
+                                                    location = "\(result.title), \(result.subtitle)"
+                                                } else {
+                                                    location = result.title
+                                                }
+                                                searchCompleter.showResults = false
+                                            }
                                         } label: {
                                             VStack(alignment: .leading) {
                                                 Text(result.title)
                                                     .font(.system(size: 14))
+                                                    .foregroundColor(.primary)
                                                 if !result.subtitle.isEmpty {
                                                     Text(result.subtitle)
                                                         .font(.system(size: 12))
