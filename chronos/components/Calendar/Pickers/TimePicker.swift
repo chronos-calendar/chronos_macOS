@@ -29,111 +29,119 @@ struct TimePicker: View {
                 .foregroundStyle(.secondary)
                 .font(.system(size: 13))
             
-            HStack(spacing: 4) {
-                Image(systemName: "clock")
-                    .foregroundColor(.primary)
-                
-                // Hour field
-                TextField("12", text: $hourText)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 14, weight: .medium))
-                    .frame(width: 20)
-                    .multilineTextAlignment(.trailing)
-                    .onChange(of: hourText) { _, newValue in
-                        let filtered = newValue.filter { $0.isNumber }
-                        if filtered != newValue {
-                            hourText = filtered
-                        }
-                        if let hour = Int(filtered) {
-                            if hour > 12 {
-                                hourText = "12"
-                            } else if hour == 0 {
-                                hourText = "1"
-                            }
-                        }
-                        if filtered.count > 2 {
-                            hourText = String(filtered.prefix(2))
-                        }
-                    }
-                    .onSubmit {
-                        validateHour()
-                        updateTime()
-                    }
-                
-                Text(":")
-                    .foregroundColor(.primary)
-                    .font(.system(size: 14, weight: .medium))
-                
-                // Minute field
-                TextField("00", text: $minuteText)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 14, weight: .medium))
-                    .frame(width: 20)
-                    .onChange(of: minuteText) { _, newValue in
-                        let filtered = newValue.filter { $0.isNumber }
-                        if filtered != newValue {
-                            minuteText = filtered
-                        }
-                        if let minute = Int(filtered) {
-                            if minute > 59 {
-                                minuteText = "59"
-                            }
-                        }
-                        if filtered.count > 2 {
-                            minuteText = String(filtered.prefix(2))
-                        }
-                        if filtered.count == 2 {
-                            validateMinute()
-                        }
-                    }
-                    .onSubmit {
-                        validateMinute()
-                        updateTime()
-                    }
-                
-                // Period toggle
-                Button(action: {
-                    selectedPeriod = selectedPeriod == "AM" ? "PM" : "AM"
-                    updateTime()
-                }) {
-                    Text(selectedPeriod)
+            ZStack(alignment: .top) {
+                HStack(spacing: 4) {
+                    Image(systemName: "clock")
+                        .foregroundColor(.primary)
+                        .frame(width: 20, alignment: .center)
+                    
+                    // Hour field
+                    TextField("12", text: $hourText)
+                        .textFieldStyle(.plain)
                         .font(.system(size: 14, weight: .medium))
+                        .frame(width: 24, alignment: .trailing)
+                        .multilineTextAlignment(.trailing)
+                        .onChange(of: hourText) { _, newValue in
+                            let filtered = newValue.filter { $0.isNumber }
+                            if filtered != newValue {
+                                hourText = filtered
+                            }
+                            if let hour = Int(filtered) {
+                                if hour > 12 {
+                                    hourText = "12"
+                                } else if hour == 0 {
+                                    hourText = "1"
+                                }
+                            }
+                            if filtered.count > 2 {
+                                hourText = String(filtered.prefix(2))
+                            }
+                        }
+                        .onSubmit {
+                            validateHour()
+                            updateTime()
+                        }
+                    
+                    Text(":")
                         .foregroundColor(.primary)
-                }
-                .buttonStyle(.plain)
-                
-                Spacer()
-                
-                Button {
-                    showPicker.toggle()
-                } label: {
-                    Image(systemName: "chevron.down")
-                        .foregroundColor(.primary)
-                        .rotationEffect(.degrees(showPicker ? 180 : 0))
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(8)
-            .background(Color.gray.opacity(0.2))
-            .cornerRadius(8)
-            
-            if showPicker {
-                ScrollerView(
-                    hourText: $hourText,
-                    minuteText: $minuteText,
-                    selectedPeriod: $selectedPeriod,
-                    showPicker: $showPicker,
-                    onTimeSelected: { hour, minute, period in
-                        hourText = "\(hour)"
-                        minuteText = String(format: "%02d", minute)
-                        selectedPeriod = period
+                        .font(.system(size: 14, weight: .medium))
+                        .frame(width: 10, alignment: .center)
+                    
+                    // Minute field
+                    TextField("00", text: $minuteText)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 14, weight: .medium))
+                        .frame(width: 24, alignment: .leading)
+                        .onChange(of: minuteText) { _, newValue in
+                            let filtered = newValue.filter { $0.isNumber }
+                            if filtered != newValue {
+                                minuteText = filtered
+                            }
+                            if let minute = Int(filtered) {
+                                if minute > 59 {
+                                    minuteText = "59"
+                                }
+                            }
+                            if filtered.count > 2 {
+                                minuteText = String(filtered.prefix(2))
+                            }
+                            if filtered.count == 2 {
+                                validateMinute()
+                            }
+                        }
+                        .onSubmit {
+                            validateMinute()
+                            updateTime()
+                        }
+                    
+                    // Period toggle
+                    Button(action: {
+                        selectedPeriod = selectedPeriod == "AM" ? "PM" : "AM"
                         updateTime()
+                    }) {
+                        Text(selectedPeriod)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.primary)
+                            .frame(width: 30, alignment: .center)
                     }
-                )
-                .frame(height: 120)
-                .background(Color(nsColor: .windowBackgroundColor))
+                    .buttonStyle(.plain)
+                    
+                    Spacer()
+                    
+                    Button {
+                        showPicker.toggle()
+                    } label: {
+                        Image(systemName: "chevron.down")
+                            .foregroundColor(.primary)
+                            .rotationEffect(.degrees(showPicker ? 180 : 0))
+                            .frame(width: 20, alignment: .center)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(8)
+                .background(Color.gray.opacity(0.2))
                 .cornerRadius(8)
-                .shadow(color: .black.opacity(0.15), radius: 8)
+                
+                if showPicker {
+                    ScrollerView(
+                        hourText: $hourText,
+                        minuteText: $minuteText,
+                        selectedPeriod: $selectedPeriod,
+                        showPicker: $showPicker,
+                        onTimeSelected: { hour, minute, period in
+                            hourText = "\(hour)"
+                            minuteText = String(format: "%02d", minute)
+                            selectedPeriod = period
+                            updateTime()
+                        }
+                    )
+                    .frame(height: 120)
+                    .background(Color(nsColor: .windowBackgroundColor))
+                    .cornerRadius(8)
+                    .shadow(color: .black.opacity(0.15), radius: 8)
+                    .offset(y: 40)
+                    .zIndex(1)
+                }
             }
         }
     }

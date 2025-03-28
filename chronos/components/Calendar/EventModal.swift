@@ -8,10 +8,10 @@ struct EventModal: View {
     @Environment(\.presentationMode) var presentationMode
     
     @State private var title: String = ""
-    @State private var startDate: Date = .now
-    @State private var endDate: Date = .now
-    @State private var startTime: Date = .now
-    @State private var endTime: Date = .now
+    @State private var startDate: Date
+    @State private var endDate: Date
+    @State private var startTime: Date
+    @State private var endTime: Date
     @State private var eventType: EventType = .task
     @State private var notifyMembers: Bool = false
     @State private var location: String = ""
@@ -31,6 +31,28 @@ struct EventModal: View {
     
     @State private var searchResults: [MKLocalSearchCompletion] = []
     @StateObject private var searchCompleter = LocationSearchCompleter()
+    
+    // Initialize with a specific date
+    init(initialDate: Date = .now) {
+        let calendar = Calendar.current
+        // Set the time components to the current time
+        let now = Date()
+        let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: now)
+        
+        // Combine the date from initialDate with the time from now
+        var dateComponents = calendar.dateComponents([.year, .month, .day], from: initialDate)
+        dateComponents.hour = timeComponents.hour
+        dateComponents.minute = timeComponents.minute
+        dateComponents.second = timeComponents.second
+        
+        let combinedDate = calendar.date(from: dateComponents) ?? initialDate
+        
+        // Initialize the state properties
+        _startDate = State(initialValue: combinedDate)
+        _endDate = State(initialValue: combinedDate)
+        _startTime = State(initialValue: combinedDate)
+        _endTime = State(initialValue: combinedDate)
+    }
     
     private var isToday: (Date) -> Bool = { date in
         Calendar.current.isDateInToday(date)
@@ -160,29 +182,36 @@ struct EventModal: View {
                 }
                 
                 // Time Start/End
-                HStack(spacing: 12) {
-                    TimePicker(title: "Time Start", selectedTime: $startTime)
-                    TimePicker(title: "Time End", selectedTime: $endTime)
+                ZStack {
+                    HStack(spacing: 12) {
+                        TimePicker(title: "Time Start", selectedTime: $startTime)
+                        TimePicker(title: "Time End", selectedTime: $endTime)
+                    }
                 }
+                .zIndex(2) // Ensure time pickers are above other elements
                 
                 // Location
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Location")
+                    Text("Location or Video Call")
                         .foregroundStyle(.secondary)
                         .font(.system(size: 13))
 
                     VStack(alignment: .leading, spacing: 0) {
                         HStack {
-                            Image(systemName: "mappin")
+                            // Change icon to support both location and video calls
+                            Image(systemName: location.contains("http") ? "video" : "mappin")
                                 .foregroundColor(.primary)
-                            TextField("Add location", text: $location)
+                            TextField("Add location or paste video call link", text: $location)
                                 .textFieldStyle(.plain)
                                 .font(.system(size: 14, weight: .medium))
                                 .onChange(of: location) { _, newValue in
-                                    // Only update queryFragment if search is enabled
-                                    // This prevents updates triggered by selecting a suggestion
-                                    if searchCompleter.shouldSearch {
+                                    // Only update queryFragment if search is enabled AND not a video call link
+                                    if searchCompleter.shouldSearch && !newValue.contains("http") {
                                         searchCompleter.queryFragment = newValue
+                                    } else if newValue.contains("http") {
+                                        // If it's a video call link, disable location search
+                                        searchCompleter.showResults = false
+                                        searchCompleter.results = []
                                     }
                                 }
                         }
@@ -317,6 +346,23 @@ struct EventModal: View {
                                 .padding(8)
                                 .background(Color.white)
                                 .cornerRadius(8)
+                            
+                            // Add red circular X button
+                            Button(action: {
+                                isAddingNewMember = false
+                                newMemberName = ""
+                            }) {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 24, height: 24)
+                                    .overlay(
+                                        Image(systemName: "xmark")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundColor(.white)
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.trailing, 8)
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)

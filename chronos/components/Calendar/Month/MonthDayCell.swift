@@ -66,7 +66,7 @@ struct MonthDayCell: View {
             showEventModal = true
         }
         .sheet(isPresented: $showEventModal) {
-            EventModal()
+            EventModal(initialDate: date)
         }
     }
     
