@@ -10,7 +10,7 @@ struct MonthDayCell: View {
     let events: [CalendarEvent]
     let cellWidth: CGFloat
     let cellHeight: CGFloat
-    
+    @State private var showEventModal = false
     private let calendar = Calendar.current
     
     private var day: Int {
@@ -58,9 +58,16 @@ struct MonthDayCell: View {
             
             Spacer()
         }
+        
         .frame(width: cellWidth, height: cellHeight)
         .background(cellBackground)
         .overlay(cellBorder)
+        .onTapGesture(count: 2){
+            showEventModal = true
+        }
+        .sheet(isPresented: $showEventModal) {
+            EventModal(initialDate: date)
+        }
     }
     
     // MARK: - Computed Properties
@@ -74,7 +81,7 @@ struct MonthDayCell: View {
         }
     }
     
-    private var cellBackground: some View {
+    private var cellBackground: some View { 
         Group {
             if isToday {
                 Color.blue.opacity(0.1)

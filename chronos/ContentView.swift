@@ -6,6 +6,7 @@ struct ContentView: View {
     @ObserveInjection var inject
     @State private var selectedGroup: TaskGroup = .all
     @State private var selectedDate: Date? = nil
+    @State private var showEventModal = false
     
     // Sample events for demonstration - you'll want to replace this with actual data from SwiftData
     @State private var events: [CalendarEvent] = [
@@ -15,23 +16,29 @@ struct ContentView: View {
     ]
     
     var body: some View {
-        HSplitView {
-            // First pane - task list (resizable)
-            VStack {
-                TabsView(selectedTab: $selectedGroup)
-                TaskListView(selectedGroup: selectedGroup)
+        ZStack {
+            HSplitView {
+                // First pane - task list (resizable)
+                VStack {
+                    TabsView(selectedTab: $selectedGroup)
+                    TaskListView(selectedGroup: selectedGroup)
+                }
+                .frame(maxHeight: .infinity)
+                .background(Color(NSColor(red: 248/255, green: 247/255, blue: 242/255, alpha: 1)))
+
+                
+                // Second pane - Calendar (flexible width)
+                CalendarView(events: events)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(NSColor(red: 248/255, green: 247/255, blue: 242/255, alpha: 1)))
             }
-            .frame(maxHeight: .infinity)
-            .background(Color.white)
+            .enableInjection()
+            .background(Color(NSColor(red: 248/255, green: 247/255, blue: 242/255, alpha: 1)))
             
-            
-            // Second pane - Calendar (flexible width)
-            CalendarView(events: events)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.white)
+            if showEventModal {
+                EventModal()
+            }
         }
-        .enableInjection()
-        .background(Color.white)
     }
 }
 
